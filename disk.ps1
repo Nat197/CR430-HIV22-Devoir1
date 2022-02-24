@@ -20,4 +20,15 @@ else{
     $logPath = 'C:\Logs'
 }
 
-$logFile = "$logPath"
+#Chemin complet vers le fichier log
+$logFile = "$logPath\diskCheck.log"
+
+#Vérifier si le répertoire est existant
+try {
+    if(-not (Test-Path -Path $logPath -ErrorAction Stop)){
+
+    }
+}
+catch {
+    
+}
