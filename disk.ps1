@@ -105,12 +105,13 @@ catch {
     
 }
 
-$espaceLibre
 #Envoyer notre messsage Telegram si l'espace du disque est bas
 
-if($espaceLibre -le 40){
+#Si l'espace libre du disque est plus petite que 20% on envoit un message
+if($espaceLibre -le 20){
     try {
-        Import-Module -Name PoshGram -ErrorAction Stop
+        #On importe le module Poshgram qui va permettre d'envoyer les messages a un chat Telegram
+        Import-Module -Name PoshGram -ErrorAction Stop  
         Add-Content -Path $logFile -Value "[INFO] Module PoshGram a été importé avec succès"
     }
     catch {
@@ -122,14 +123,16 @@ if($espaceLibre -le 40){
 
     Add-Content -Path $logFile -Value "[INFO] Envoi de la notification telegram"
 
+    #Parametres necessaires à l'envoi d'un telegram text message
 	$message = @{
-		BotToken = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag"
-		ChatID = "-1001663472259"
-		Message = "[ESPACE BAS] Le disque $Drive est à $espaceLibre%"
+		BotToken = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+		ChatID = "-1001663472259" #ID du groupe telegram créé
+		Message = "[ESPACE BAS] Le disque $Drive est à $espaceLibre%"  #Message de notre notification
 		ErrorAction = 'Stop'
 	}
     
-
+    #Envoie du message contenant la notification dans le channel telegram spécifié
+    #C'est le bot créé (cr430_bot) qui envoit ce message
 	try {
 		Send-TelegramTextMessage @message
 		Add-Content -Path $logFile -Value "[INFO] Message envoyé avec succès"
