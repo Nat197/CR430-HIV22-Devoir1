@@ -50,17 +50,34 @@ else{
 
 #Collecter les informations du disque dur
 
+#Systeme Linux
 if($PSVersionTable.Platform -eq 'Unix'){ #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
     #used
     #free
     $volume = Get-PSDrive -Name $Drive
     #Vérifier si le drive existe
     if($volume){
-        $total = $volume.Used + $volume.Free
+        $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
+        $espaceLibre = [int](($volume.Free / $total)*100)  #Division espace libre avec espace total converti en pourcentage
+
+        Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
     }else{
         Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+        throw
     }
 }
+#Systeme Windows
 else{
+    #Sélectionner le disque dont la lettre correspond a celle spécifié par l'utilisateur
+    $volume = Get-Volume-ErrorAction Stop | Where-Object($_.DriveLetter -eq $Drive) 
     
+    if($volume){
+        $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
+        $espaceLibre = [int](($volume.Free / $total)*100)  #Division espace libre avec espace total converti en pourcentage
+
+        Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
+    }else{
+        Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+        throw
+    }
 }
