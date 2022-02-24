@@ -131,3 +131,24 @@ else {
         throw
     }
 }
+
+
+#Envoyer notre messsage Telegram si l'espace du disque est bas
+
+if($espaceLibre -le 20){
+    try {
+        Import-Module - Name PoshGram -ErrorAction Stop
+        Add-Content -Path $logFile -Value "[INFO] Module PoshGram a été importé avec succès"
+    }
+    catch {
+        Add-Content -Path $logFile -Value "[ERREUR] Module PoshGram n'a pas pu être importé"
+        #Ajout duFichier spécifique de l'erreur
+        Add-Content -Path $logFile -Value $_
+    }
+
+    Add-Content -Path $logFile -Value "[INFO] Envoi de la notification telegram"
+
+    $botToken = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag"
+    $chat = "-5288861772"
+    Send-TelegramTextMessage -BotToken $botToken -ChatID $chat -Message "L'espace disponible de votre disque est bas"
+}
