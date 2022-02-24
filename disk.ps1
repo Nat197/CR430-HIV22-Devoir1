@@ -13,10 +13,10 @@
 #Emplacement des logs
 
 #Vérification du OS et sélection de l'emplacement selon le OS
-if($PSVersionTable.Platform -eq 'Unix'){
+if ($PSVersionTable.Platform -eq 'Unix') {
     $logPath = '/tmp'
 }
-else{
+else {
     $logPath = 'C:\Logs'
 }
 
@@ -26,7 +26,7 @@ $logFile = "$logPath\diskCheck.log"
 #Vérifier si le répertoire est existant
 try {
     #Répertoire n'est pas trouvé
-    if(-not (Test-Path -Path $logPath -ErrorAction Stop)){
+    if (-not (Test-Path -Path $logPath -ErrorAction Stop)) {
         New-Item -ItemType Directory -Path $logPath -ErrorAction Stop | Out-Null  #Out-Null permet de ne pas afficher plein de lignes dans la console
         New-Item -ItemType File -Path $logFile | Out-Null
     }
@@ -40,43 +40,93 @@ catch {
 Add-Content -Path $logFile -Value "[INFO] Execution en cours de $PSCommandPath"
 
 #Vérifier que PoshGram est installé sinon on log l'erreur dans notre fichier log
-if(-not (Get-Module -Name PoshGram -ListAvailable)){
+if (-not (Get-Module -Name PoshGram -ListAvailable)) {
     Add-Content -Path $logFile -Value "[ERREUR] PoshGram n'est pas installé."
     throw
 }
-else{
+else {
     Add-Content -Path $logFile -Value "[INFO] PoshGram est installé."
 }
 
 #Collecter les informations du disque dur
 
+#Si une erreur survient le -ErrorAction Stop va attraper cette erreur
+try {
+    #Systeme Linux
+    if ($PSVersionTable.Platform -eq 'Unix') {
+        #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
+        #used
+        #free
+        $volume = Get-PSDrive -Name $Drive -ErrorAction Stop
+        #Vérifier si le drive existe
+        if ($volume) {
+            $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
+            $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
+
+            Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
+        }
+        else {
+            Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+            throw
+        }
+    }
+    #Systeme Windows
+    else {
+        #Sélectionner le disque dont la lettre correspond a celle spécifié par l'utilisateur
+        $volume = Get-Volume -ErrorAction Stop | Where-Object($_.DriveLetter -eq $Drive) 
+
+        if ($volume) {
+            $total = $volume.Size #Sur windows la propriété size calcule notre espace directement
+            $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
+
+            Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
+        }
+        else {
+            Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+            throw
+        }
+    }
+
+}
+catch {
+    #Ajouter l'erreur dans les logs
+    Add-Content -Path $logFile -Value "[ERREUR] Impossible d'obtenir les informations"
+    #Erreur originale
+    Add-Content -Path $logFile -Value $_
+    throw
+    
+}
+
 #Systeme Linux
-if($PSVersionTable.Platform -eq 'Unix'){ #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
+if ($PSVersionTable.Platform -eq 'Unix') {
+    #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
     #used
     #free
     $volume = Get-PSDrive -Name $Drive
     #Vérifier si le drive existe
-    if($volume){
+    if ($volume) {
         $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
-        $espaceLibre = [int](($volume.Free / $total)*100)  #Division espace libre avec espace total converti en pourcentage
+        $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
 
         Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
-    }else{
+    }
+    else {
         Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
         throw
     }
 }
 #Systeme Windows
-else{
+else {
     #Sélectionner le disque dont la lettre correspond a celle spécifié par l'utilisateur
     $volume = Get-Volume-ErrorAction Stop | Where-Object($_.DriveLetter -eq $Drive) 
-    
-    if($volume){
-        $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
-        $espaceLibre = [int](($volume.Free / $total)*100)  #Division espace libre avec espace total converti en pourcentage
+
+    if ($volume) {
+        $total = $volume.Size #Sur windows la propriété size calcule notre espace directement
+        $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
 
         Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre"
-    }else{
+    }
+    else {
         Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
         throw
     }
