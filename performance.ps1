@@ -104,8 +104,8 @@ try {
 
         #Parametres necessaires à l'envoi d'un telegram text message
         $message = @{
-            BotToken    = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
-            ChatID      = "-1001663472259" #ID du groupe telegram créé
+            BotToken    = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+            ChatID      = "-XXXXXXXXXXXX" #ID du groupe telegram créé
             Message     = $alerte  #Message de notre notification
             ErrorAction = 'Stop'
         }
@@ -119,8 +119,8 @@ try {
 
         #Parametres necessaires à l'envoi d'un telegram text message
         $message = @{
-            BotToken    = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
-            ChatID      = "-1001663472259" #ID du groupe telegram créé
+            BotToken    = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+            ChatID      = "-XXXXXXXXXXXX" #ID du groupe telegram créé
             Message     = $alerte  #Message de notre notification
             ErrorAction = 'Stop'
         }
@@ -134,8 +134,8 @@ try {
 
         #Parametres necessaires à l'envoi d'un telegram text message
         $message = @{
-            BotToken    = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
-            ChatID      = "-1001663472259" #ID du groupe telegram créé
+            BotToken    = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+            ChatID      = "-XXXXXXXXXXXX" #ID du groupe telegram créé
             Message     = $alerte  #Message de notre notification
             ErrorAction = 'Stop'
         }
@@ -149,8 +149,8 @@ try {
 
         #Parametres necessaires à l'envoi d'un telegram text message
         $message = @{
-            BotToken    = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
-            ChatID      = "-1001663472259" #ID du groupe telegram créé
+            BotToken    = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+            ChatID      = "-XXXXXXXXXXXX" #ID du groupe telegram créé
             Message     = $alerte  #Message de notre notification
             ErrorAction = 'Stop'
         }
@@ -168,8 +168,8 @@ Add-Content -Path $logFile -Value "[$date] [INFO] Envoi de la notification teleg
 
 #Parametres necessaires à l'envoi d'un telegram text message
 $message = @{
-    BotToken    = "5265838193:AAHyjN5YwfwDEiX8zCnXM4anZgu4pxj9qag" #obtenu lors de la creation du bot dans telegram (cr430_bot)
-    ChatID      = "-1001663472259" #ID du groupe telegram créé
+    BotToken    = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" #obtenu lors de la creation du bot dans telegram (cr430_bot)
+    ChatID      = "-XXXXXXXXXXXX" #ID du groupe telegram créé
     Message     = $alerte  #Message de notre notification
     ErrorAction = 'Stop'
 }
