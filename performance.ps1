@@ -1,4 +1,3 @@
-
 <#
     Titre: Module powershell de vérification des performances de l'ordinateur
     Auteur : Nathan Bourgoin et Gabriel Bellemare
@@ -27,9 +26,6 @@ param (
     [string]  
     $Max_BytesSent
 )
-
-
-
 #Répertoire des logs
 $logPath = 'C:\Logs'
 
@@ -57,7 +53,6 @@ $date = Get-Date
 
 Add-Content -Path $logFile -Value "[$date] [INFO] Execution en cours de $PSCommandPath"
 
-
 #Vérifier que PoshGram est installé sinon on log l'erreur dans notre fichier log
 if (-not (Get-Module -Name PoshGram -ListAvailable)) {
     Add-Content -Path $logFile -Value "[$date] [ERREUR] PoshGram n'est pas installé."
@@ -82,12 +77,10 @@ try {
     $CimInstance = Get-CimInstance -class Win32_PerfFormattedData_Tcpip_NetworkInterface  
     $BytesReceived = $CimInstance.BytesReceivedPerSec
     $BytesSent = $CimInstance.BytesSentPerSec
-
 }
 catch {
     throw
 }
-
 #On importe le module Poshgram pour envoyer les notifications
 try {
     #On importe le module Poshgram qui va permettre d'envoyer les messages a un chat Telegram
@@ -173,7 +166,6 @@ $message = @{
     Message     = $alerte  #Message de notre notification
     ErrorAction = 'Stop'
 }
-    
 #Envoie du message contenant la notification dans le channel telegram spécifié
 #C'est le bot créé (cr430_bot) qui envoit ce message
 try {

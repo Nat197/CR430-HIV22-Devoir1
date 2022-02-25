@@ -11,7 +11,6 @@
     spécifier quel disque vérifier ainsi que la limite minimale d'espace.
 #>
 
-
 #Déclaration d'un parametre obligatoire qui est la lettre du disque
 param (
     [Parameter(Mandatory = $true)]  #Critères du paramètre
@@ -151,7 +150,5 @@ if($espaceLibre -le 90){
 		Add-Content -Path $logFile -Value "[$date] [ERREUR] Une erreur est survenue lors de l'envoi du message"
 		Add-Content -Path $logFile -Value $_
         throw
-	}
-
-    
+	}  
 }
