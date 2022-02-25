@@ -3,6 +3,7 @@
     Auteur : Nathan Bourgoin et Gabriel Bellemare
     Date : 23/02/2022
     Version : 1.0
+    Système d'exploitation: Windows ou Linux
     Description : Ce module powershell va permettre de vérifier certaines caractéristiques
     du disque dur et pourra notifier l'utilisateur selon certaines règles établies. Le script
     va vérifier par exemple l'espace disponible et envoyer une notification si l'espace est
@@ -19,8 +20,14 @@ param (
 )
 
 #Emplacement des logs
-$logPath = 'C:\Logs'
 
+#Vérification du OS et sélection de l'emplacement selon le OS
+if ($PSVersionTable.Platform -eq 'Unix') {
+    $logPath = '/tmp'
+}
+else {
+    $logPath = 'C:\Logs'
+}
 
 #Chemin complet vers le fichier log
 $logFile = "$logPath\diskCheck.log"
@@ -56,6 +63,27 @@ else {
 
 #Si une erreur survient le -ErrorAction Stop va attraper cette erreur
 try {
+    #Systeme Linux
+    if ($PSVersionTable.Platform -eq 'Unix') {
+        #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
+        #used
+        #free
+        $volume = Get-PSDrive -Name $Drive -ErrorAction Stop
+        #Vérifier si le drive existe
+        if ($volume) {
+            $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
+            $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
+
+            Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre%"
+        }
+        else {
+            Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+            throw
+        }
+    }
+    #Systeme Windows
+    else {
+        #Sélectionner le disque dont la lettre correspond a celle spécifié par l'utilisateur
         $volume = Get-Volume -ErrorAction Stop | Where-Object{$_.DriveLetter -eq $Drive} 
 
         if ($volume) {
@@ -69,7 +97,7 @@ try {
             Add-Content -Path $logFile -Value "[$date] [ERREUR] $Drive n'est pas existant"
             throw
         }
-    # }
+     }
 
 }
 catch {
