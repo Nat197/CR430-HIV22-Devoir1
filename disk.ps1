@@ -21,12 +21,12 @@ param (
 #Emplacement des logs
 
 #Vérification du OS et sélection de l'emplacement selon le OS
-if ($PSVersionTable.Platform -eq 'Unix') {
-    $logPath = '/tmp'
-}
-else {
+# if ($PSVersionTable.Platform -eq 'Unix') {
+#     $logPath = '/tmp'
+# }
+# else {
     $logPath = 'C:\Logs'
-}
+# }
 
 #Chemin complet vers le fichier log
 $logFile = "$logPath\diskCheck.log"
@@ -45,60 +45,64 @@ catch {
 }
 
 #Commentaire de début de script pour dire d'ou la commande a été exécuté dans les logs
-Add-Content -Path $logFile -Value "[INFO] Execution en cours de $PSCommandPath"
+Add-Content -Path $logFile -Value "[$date] [INFO] Execution en cours de $PSCommandPath"
 
 #Vérifier que PoshGram est installé sinon on log l'erreur dans notre fichier log
 if (-not (Get-Module -Name PoshGram -ListAvailable)) {
-    Add-Content -Path $logFile -Value "[ERREUR] PoshGram n'est pas installé."
+    $date = Get-Date
+    Add-Content -Path $logFile -Value "[$date] [ERREUR] PoshGram n'est pas installé."
     throw
 }
 else {
-    Add-Content -Path $logFile -Value "[INFO] PoshGram est installé."
+    $date = Get-Date
+    Add-Content -Path $logFile -Value "[$date] [INFO] PoshGram est installé."
 }
 
 #Collecter les informations du disque dur
 
 #Si une erreur survient le -ErrorAction Stop va attraper cette erreur
 try {
-    #Systeme Linux
-    if ($PSVersionTable.Platform -eq 'Unix') {
-        #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
-        #used
-        #free
-        $volume = Get-PSDrive -Name $Drive -ErrorAction Stop
-        #Vérifier si le drive existe
-        if ($volume) {
-            $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
-            $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
+    # #Systeme Linux
+    # if ($PSVersionTable.Platform -eq 'Unix') {
+    #     #les commandes sont différentes sur linux donc on doit avoir deux sections de commandes selon le OS
+    #     #used
+    #     #free
+    #     $volume = Get-PSDrive -Name $Drive -ErrorAction Stop
+    #     #Vérifier si le drive existe
+    #     if ($volume) {
+    #         $total = $volume.Used + $volume.Free  #déterminer l'espace total de notre disque
+    #         $espaceLibre = [int](($volume.Free / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
 
-            Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre%"
-        }
-        else {
-            Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
-            throw
-        }
-    }
+    #         Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre%"
+    #     }
+    #     else {
+    #         Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+    #         throw
+    #     }
+    # }
     #Systeme Windows
-    else {
+    # else {
         #Sélectionner le disque dont la lettre correspond a celle spécifié par l'utilisateur
         $volume = Get-Volume -ErrorAction Stop | Where-Object{$_.DriveLetter -eq $Drive} 
 
         if ($volume) {
             $total = $volume.Size #Sur windows la propriété size calcule notre espace directement
             $espaceLibre = [int](($volume.SizeRemaining / $total) * 100)  #Division espace libre avec espace total converti en pourcentage
-
-            Add-Content -Path $logFile -Value "[INFO] Espace libre : $espaceLibre%"
+            $date = Get-Date
+            Add-Content -Path $logFile -Value "[$date] [INFO] Espace libre : $espaceLibre%"
         }
         else {
-            Add-Content -Path $logFile -Value "[ERREUR] $Drive n'est pas existant"
+            $date = Get-Date
+            Add-Content -Path $logFile -Value "[$date] [ERREUR] $Drive n'est pas existant"
             throw
         }
-    }
+    # }
 
 }
 catch {
     #Ajouter l'erreur dans les logs
-    Add-Content -Path $logFile -Value "[ERREUR] Impossible d'obtenir les informations"
+    $date = Get-Date
+    Add-Content -Path $logFile -Value "[$date] [ERREUR] Impossible d'obtenir les informations"
     #Erreur originale
     Add-Content -Path $logFile -Value $_
     throw
@@ -111,17 +115,20 @@ catch {
 if($espaceLibre -le 20){
     try {
         #On importe le module Poshgram qui va permettre d'envoyer les messages a un chat Telegram
+        $date = Get-Date
         Import-Module -Name PoshGram -ErrorAction Stop  
-        Add-Content -Path $logFile -Value "[INFO] Module PoshGram a été importé avec succès"
+        Add-Content -Path $logFile -Value "[$date] [INFO] Module PoshGram a été importé avec succès"
     }
     catch {
-        Add-Content -Path $logFile -Value "[ERREUR] Module PoshGram n'a pas pu être importé"
+        $date = Get-Date
+        Add-Content -Path $logFile -Value "[$date] [ERREUR] Module PoshGram n'a pas pu être importé"
         #Ajout duFichier spécifique de l'erreur
         Add-Content -Path $logFile -Value $_
         throw
     }
-
-    Add-Content -Path $logFile -Value "[INFO] Envoi de la notification telegram"
+    $date = Get-Date
+    Add-Content -Path $logFile -Value "[$date] [INFO] Envoi de la notification telegram"
+    Add-Content -Path $logFile -Value "[$date] [ESPACE BAS] Le disque $Drive est à $espaceLibre%"
 
     #Parametres necessaires à l'envoi d'un telegram text message
 	$message = @{
@@ -134,11 +141,13 @@ if($espaceLibre -le 20){
     #Envoie du message contenant la notification dans le channel telegram spécifié
     #C'est le bot créé (cr430_bot) qui envoit ce message
 	try {
+        $date = Get-Date
 		Send-TelegramTextMessage @message
-		Add-Content -Path $logFile -Value "[INFO] Message envoyé avec succès"
+		Add-Content -Path $logFile -Value "[$date]  [INFO] Message envoyé avec succès"
 	}
 	catch {
-		Add-Content -Path $logFile -Value "[ERREUR] Une erreur est survenue lors de l'envoi du message"
+        $date = Get-Date
+		Add-Content -Path $logFile -Value "[$date] [ERREUR] Une erreur est survenue lors de l'envoi du message"
 		Add-Content -Path $logFile -Value $_
         throw
 	}
