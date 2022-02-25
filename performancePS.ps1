@@ -14,7 +14,7 @@ $properties = @{
     physicalDiskTotalOctets = $physicalDiskTotalOctets.CounterSamples.CookedValue
     physicalDiskPourcentageInactivite = $physicalDiskPourcentageInactivite.CounterSamples.CookedValue
 }
-$exportObject = New-Object psobject -Property $propertie
+$exportObject = New-Object psobject -Property $properties
 #Repertoire ou le fichier de resultat sera sauvergarder
 $RepertoireSortie = "C:\DevoirCR430_Performance-Counters"
 
@@ -29,7 +29,7 @@ if (-not(Test-Path $RepertoireSortie))
 #Enleve le \ a la fin du Path si nessecaire.
 if ($RepertoireSortie.EndsWith("\")) {$RepertoireSortie = $RepertoireSortie.Substring(0, $RepertoireSortie.Length - 1)}
 
-$FichierSortie = "$RepertoireSortie\{$computerName}) $(Get-Date -Format "yyyy_MM_dd HH_mm_ss")-Performance.cvs" 
+$FichierSortie = "$RepertoireSortie\{$computerName}) $(Get-Date -Format "yyyy_MM_dd HH_mm_ss")-Performance.csv" 
 
 
 Write-Host $exportObject
